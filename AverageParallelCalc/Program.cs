@@ -23,27 +23,9 @@ namespace AverageParallelCalc
             Stopwatch stopwatch3 = new Stopwatch();
             // последовательное вычисление
             stopwatch1.Start();
-            for (int i = 0; i < limit1; i++)
-            {
-                array1[i] = random1.Next(limit1);
-            }
-
-            for (int i = 0; i < limit1; i++)
-            {
-                sum1 += array1[i];
-            }
+            avg1 = CalcArrayAverage(limit1);
             //
-            for (int i = 0; i < limit2; i++)
-            {
-                array2[i] = random2.Next(limit2);
-            }
-
-            for (int i = 0; i < limit2; i++)
-            {
-                sum2 += array2[i];
-            }
-            avg1 = sum1 / limit1;
-            avg2 = sum2 / limit2;
+            avg2 = CalcArrayAverage(limit2);
             stopwatch1.Stop();
             Console.WriteLine("Последовательное вычисление");
             Console.WriteLine($"Среднее из {limit1}: {avg1}");
@@ -57,18 +39,8 @@ namespace AverageParallelCalc
             ThreadPool.QueueUserWorkItem(_ =>
             {
                 stopwatch2.Start();
-                
-                for (int i = 0; i < limit1; i++)
-                {
-                    array1[i] = random1.Next(limit1);
-                }
-
-                for (int i = 0; i < limit1; i++)
-                {
-                    sum1 += array1[i];
-                }
+                avg1 = CalcArrayAverage(limit1);
                 stopwatch2.Stop();
-                avg1 = sum1 / limit1;
                 Console.WriteLine("Паралельное вычисление");
                 Console.WriteLine($"Среднее из {limit1}: {avg1}. Вычмслено за {stopwatch2.ElapsedMilliseconds}");
             });
@@ -76,27 +48,26 @@ namespace AverageParallelCalc
             ThreadPool.QueueUserWorkItem(_ =>
             {
                 stopwatch3.Start();
-                for (int i = 0; i < limit2; i++)
-                {
-                    array2[i] = random2.Next(limit2);
-                }
-
-                for (int i = 0; i < limit2; i++)
-                {
-                    sum2 += array2[i];
-                } 
+                avg2 = CalcArrayAverage(limit2); 
                 stopwatch3.Stop();
-                avg2 = sum2 / limit2;
                 Console.WriteLine("Паралельное вычисление");
                 Console.WriteLine($"Среднее из {limit2}: {avg2}. Вычмслено за {stopwatch3.ElapsedMilliseconds}");
             });
-            /*
-            stopwatch2.Stop();
-            Console.WriteLine("Паралельное вычисление");
-            Console.WriteLine($"Среднее из {limit1}: {avg1}");
-            Console.WriteLine($"Среднее из {limit2}: {avg2}. Вычислено за {stopwatch2.ElapsedMilliseconds}");
-            */
-            Console.Read();
+            Console.ReadLine();
+        }
+
+        public static long CalcArrayAverage(int size)
+        {
+            long sum = 0;
+            int[] array = new int[size]; 
+            Random random = new Random();
+            for (int i = 0; i < size; i++)
+            {
+                array[i] = random.Next(size);
+                sum += array[i];
+            }
+
+            return sum / size;
         }
     }
 }
