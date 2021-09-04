@@ -9,6 +9,7 @@ namespace AverageParallelCalc
         static AutoResetEvent waitHandler1 = new AutoResetEvent(true);
         static AutoResetEvent waitHandler2 = new AutoResetEvent(true);
         static WaitHandle[] waitHandles = new[] {waitHandler1,waitHandler2 };
+        
         static void Main(string[] args)
         {
             int limit1 = 10000000;
@@ -48,10 +49,8 @@ namespace AverageParallelCalc
             });
             AutoResetEvent.WaitAll(waitHandles);
             stopwatch2.Stop();
-            //Thread.CurrentThread.Join(1000);
             Console.WriteLine($"Вычислено за {stopwatch2.ElapsedMilliseconds} мс");
             Console.WriteLine("Финиш!");
-            //Console.ReadLine();
         }
 
         public static long CalcArrayAverage(int size)
