@@ -11,24 +11,21 @@ namespace AverageParallelCalc
         static WaitHandle[] waitHandles = new[] {waitHandler1,waitHandler2 };
         static void Main(string[] args)
         {
-            
             int limit1 = 10000000;
             int limit2 = 100000000;
             long avg1;
             long avg2;
             Stopwatch stopwatch1 = new Stopwatch();
             Stopwatch stopwatch2 = new Stopwatch();
-            Stopwatch stopwatch3 = new Stopwatch();
+            
             // последовательное вычисление
             stopwatch1.Start();
             avg1 = CalcArrayAverage(limit1);
-            //
             avg2 = CalcArrayAverage(limit2);
             stopwatch1.Stop();
             Console.WriteLine("Последовательное вычисление");
             Console.WriteLine($"Среднее из {limit1}: {avg1}");
             Console.WriteLine($"Среднее из {limit2}: {avg2}. Вычислено за {stopwatch1.ElapsedMilliseconds} мс");
-            stopwatch1.Reset();
             
             //параллельное вычисление
             Console.WriteLine("Паралельное вычисление");
@@ -50,9 +47,9 @@ namespace AverageParallelCalc
                 waitHandler2.Set();
             });
             AutoResetEvent.WaitAll(waitHandles);
-            stopwatch2.Start();
+            stopwatch2.Stop();
             //Thread.CurrentThread.Join(1000);
-            Console.WriteLine($"Вычмслено за {stopwatch2.ElapsedMilliseconds} мс");
+            Console.WriteLine($"Вычислено за {stopwatch2.ElapsedMilliseconds} мс");
             Console.WriteLine("Финиш!");
             //Console.ReadLine();
         }
