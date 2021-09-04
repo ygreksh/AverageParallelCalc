@@ -6,16 +6,14 @@ namespace AverageParallelCalc
 {
     class Program
     {
+        static AutoResetEvent waitHandler1 = new AutoResetEvent(true);
+        static AutoResetEvent waitHandler2 = new AutoResetEvent(true);
+        static WaitHandle[] waitHandles = new[] {waitHandler1,waitHandler2 };
         static void Main(string[] args)
         {
+            
             int limit1 = 10000000;
             int limit2 = 100000000;
-            int[] array1 = new int[limit1];
-            int[] array2 = new int[limit2];
-            Random random1 = new Random();
-            Random random2 = new Random();
-            long sum1 = 0;
-            long sum2 = 0;
             long avg1;
             long avg2;
             Stopwatch stopwatch1 = new Stopwatch();
@@ -29,31 +27,34 @@ namespace AverageParallelCalc
             stopwatch1.Stop();
             Console.WriteLine("Последовательное вычисление");
             Console.WriteLine($"Среднее из {limit1}: {avg1}");
-            Console.WriteLine($"Среднее из {limit2}: {avg2}. Вычислено за {stopwatch1.ElapsedMilliseconds}");
+            Console.WriteLine($"Среднее из {limit2}: {avg2}. Вычислено за {stopwatch1.ElapsedMilliseconds} мс");
             stopwatch1.Reset();
             
             //параллельное вычисление
-            sum1 = 0;
-            sum2 = 0;
+            Console.WriteLine("Паралельное вычисление");
             //массив array2 [10М]
             ThreadPool.QueueUserWorkItem(_ =>
             {
                 stopwatch2.Start();
+                waitHandler1.WaitOne();
                 avg1 = CalcArrayAverage(limit1);
-                stopwatch2.Stop();
-                Console.WriteLine("Паралельное вычисление");
-                Console.WriteLine($"Среднее из {limit1}: {avg1}. Вычмслено за {stopwatch2.ElapsedMilliseconds}");
+                Console.WriteLine($"Среднее из {limit1}: {avg1}");
+                waitHandler1.Set();
             });
             //массив array2 [100М]
             ThreadPool.QueueUserWorkItem(_ =>
             {
-                stopwatch3.Start();
+                waitHandler2.WaitOne();
                 avg2 = CalcArrayAverage(limit2); 
-                stopwatch3.Stop();
-                Console.WriteLine("Паралельное вычисление");
-                Console.WriteLine($"Среднее из {limit2}: {avg2}. Вычмслено за {stopwatch3.ElapsedMilliseconds}");
+                Console.WriteLine($"Среднее из {limit2}: {avg2}");
+                waitHandler2.Set();
             });
-            Console.ReadLine();
+            AutoResetEvent.WaitAll(waitHandles);
+            stopwatch2.Start();
+            //Thread.CurrentThread.Join(1000);
+            Console.WriteLine($"Вычмслено за {stopwatch2.ElapsedMilliseconds} мс");
+            Console.WriteLine("Финиш!");
+            //Console.ReadLine();
         }
 
         public static long CalcArrayAverage(int size)
